@@ -4,6 +4,11 @@ import java.util.Optional;
 
 public class Problem2 {
 
+    /**
+     * Search an element in a sorted and rotated array
+     * https://www.geeksforgeeks.org/search-an-element-in-a-sorted-and-pivoted-array/
+     * */
+
     public static Optional<Integer> searchSortedRotatedArray(Integer[] sortedRotatedArray, int searchValue) {
         int rotationIndex = findRotationIndex(sortedRotatedArray, 0, sortedRotatedArray.length - 1);
 

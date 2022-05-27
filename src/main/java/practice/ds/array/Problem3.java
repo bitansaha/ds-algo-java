@@ -6,6 +6,11 @@ import java.util.Optional;
 
 public class Problem3 {
 
+    /**
+     * Given a sorted and rotated array, find if there is a pair with a given sum
+     * https://www.geeksforgeeks.org/given-a-sorted-and-rotated-array-find-if-there-is-a-pair-with-a-given-sum/
+     * */
+
     public static Optional<Pair<Integer, Integer>> findSumPairInSortedRotatedArray(Integer[] sortedRotatedArray, int sumValue) {
         if (sortedRotatedArray.length == 1) return Optional.empty();
 
