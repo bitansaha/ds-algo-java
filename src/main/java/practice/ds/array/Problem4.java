@@ -33,7 +33,6 @@ public class Problem4 {
     }
 
     public static void main(String[] args) {
-        System.out.println("Left Rotate");
         System.out.println("1 --> " + findMaxLeftRotatedValueIndexSum(new int[]{1, 20, 2, 10}));
         System.out.println("2 --> " + findMaxLeftRotatedValueIndexSum(new int[]{10, 1, 2, 3, 4, 5, 6, 7, 8, 9}));
     }
