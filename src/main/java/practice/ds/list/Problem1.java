@@ -127,6 +127,69 @@ public class Problem1 {
 
             head = finalHead;
         }
+
+        public void batchRotateTwo(int rotationCount, int groupSize) {
+            rotationCount = rotationCount % groupSize;
+
+            int leftGroupSize = groupSize - rotationCount;
+            int rightGroupSize = rotationCount;
+
+            Node<DataType> futureHead = null;
+
+            Node<DataType> leftGroupHead = head;
+            Node<DataType> rightGroupHead = null;
+
+            Node<DataType> lastGroupTail = null;
+
+            while (leftGroupHead != null) {
+                Node<DataType> currentNode = leftGroupHead.next;
+                Node<DataType> leftGroupTail = leftGroupHead;
+
+                for (int leftGroupIndex = 1; leftGroupIndex < leftGroupSize; leftGroupIndex++) {
+                    if (currentNode == null) break;
+                    Node<DataType> tempNode = currentNode.next;
+                    currentNode.next = leftGroupHead;
+                    leftGroupHead = currentNode;
+                    currentNode = tempNode;
+                }
+
+                rightGroupHead = currentNode;
+                if (rightGroupHead != null) currentNode = rightGroupHead.next;
+                Node<DataType> rightGroupTail = rightGroupHead;
+
+                for (int rightGroupIndex = 1; rightGroupIndex < rightGroupSize; rightGroupIndex++) {
+                    if (currentNode == null) break;
+                    Node<DataType> tempNode = currentNode.next;
+                    currentNode.next = rightGroupHead;
+                    rightGroupHead = currentNode;
+                    currentNode = tempNode;
+                }
+
+                leftGroupTail.next = rightGroupHead;
+                if (rightGroupTail != null) rightGroupTail.next = null;
+                Node<DataType> nextGroupCurrentNode = currentNode;
+
+                Node<DataType> headNode = leftGroupHead;
+                Node<DataType> tailNode = leftGroupHead;
+                currentNode = headNode.next;
+                headNode.next = null;
+                while (currentNode != null) {
+                    Node<DataType> tempNode = currentNode.next;
+                    currentNode.next = headNode;
+                    headNode = currentNode;
+                    currentNode = tempNode;
+                }
+
+                if (futureHead == null) futureHead = headNode;
+                if (lastGroupTail != null) lastGroupTail.next = headNode;
+                lastGroupTail = tailNode;
+
+                leftGroupHead = nextGroupCurrentNode;
+            }
+
+            head = futureHead;
+        }
+
     }
 
     public static void main(String[] args) {
@@ -142,6 +205,18 @@ public class Problem1 {
         System.out.println("batch rotate ONE --> ");
         singlyLinkedListOne.printList();
 
+        // First Problem Second Approach
+        System.out.println(" ========= First Problem Second Approach ========= ");
+        singlyLinkedListOne = new SinglyLinkedList<>();
+
+        for (int value = 100; value >= 10; value -= 10)
+            singlyLinkedListOne.add(value);
+
+        singlyLinkedListOne.printList();
+        singlyLinkedListOne.batchRotateTwo(2, 4);
+        System.out.println("batch rotate TWO --> ");
+        singlyLinkedListOne.printList();
+
         // Second Problem First Approach
         System.out.println("\n ========= Second Problem First Approach ========= ");
         singlyLinkedListOne = new SinglyLinkedList<>();
@@ -152,6 +227,18 @@ public class Problem1 {
         singlyLinkedListOne.printList();
         singlyLinkedListOne.batchRotateOne(1, 3);
         System.out.println("batch rotate ONE --> ");
+        singlyLinkedListOne.printList();
+
+        // Second Problem Second Approach
+        System.out.println("\n ========= Second Problem Second Approach ========= ");
+        singlyLinkedListOne = new SinglyLinkedList<>();
+
+        for (int value = 100; value >= 40; value -= 10)
+            if (value != 50) singlyLinkedListOne.add(value);
+
+        singlyLinkedListOne.printList();
+        singlyLinkedListOne.batchRotateTwo(1, 3);
+        System.out.println("batch rotate TWO --> ");
         singlyLinkedListOne.printList();
     }
 }
