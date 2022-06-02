@@ -7,7 +7,7 @@ public class Problem1 {
      * https://www.geeksforgeeks.org/left-rotate-linked-list-by-x-in-groups-of-y-nodes/
      */
 
-    public static class SinglyLinkedList<DataType> {
+    public static abstract class SinglyLinkedList<DataType> {
         class Node<NodeDataType> {
             private Node(NodeDataType data, Node<NodeDataType> nextNode) {
                 this.value = data;
@@ -22,7 +22,7 @@ public class Problem1 {
             Node<NodeDataType> next;
         }
 
-        private Node<DataType> head;
+        protected Node<DataType> head;
 
         public void addAll(DataType[] dataArray) {
             for (DataType dataType : dataArray) {
@@ -47,198 +47,214 @@ public class Problem1 {
             }
         }
 
-        public void batchRotateOne(int rotationCount, int groupSize) {
-            if (head == null) return;
+        public abstract void batchRotate(int rotationCount, int groupSize);
 
+    }
+
+    public static class SinglyLinkedListOne<DataType> extends SinglyLinkedList<DataType> {
+
+        @Override
+        public void batchRotate(int rotationCount, int groupSize) {
             rotationCount = rotationCount % groupSize;
+            Node<DataType> headNode = null;
+            Node<DataType> lastGroupTailNode = null;
+            Node<DataType> nextGroupHeadNode = head;
 
-            int rightGroupSize = rotationCount;
-            int leftGroupSize = groupSize - rightGroupSize;
-
-            Node<DataType> finalHead = null;
-
-            Node<DataType> groupLeftHead = head;
-            Node<DataType> groupLeftTail = groupLeftHead;
-            Node<DataType> groupRightHead = null;
-            Node<DataType> groupRightTail = null;
-
-            Node<DataType> lastGroupTail = null;
-            Node<DataType> nextGroupHead = null;
-
-            masterLoop:
-            while (groupLeftHead != null) {
-                if (leftGroupSize > 0) {
-                    for (int leftGroupIndex = 1; leftGroupIndex < leftGroupSize; leftGroupIndex++) {
-                        groupLeftTail = groupLeftTail.next;
-
-                        if (groupLeftTail == null) {
-                            int lastGroupSize = leftGroupIndex;
-                            rightGroupSize = rotationCount % lastGroupSize == 0 ? lastGroupSize : rotationCount % lastGroupSize;
-                            leftGroupSize = lastGroupSize - rightGroupSize;
-                            groupLeftTail = groupLeftHead;
-                            continue masterLoop;
-                        }
-                    }
-
-                    groupRightHead = groupLeftTail.next;
-                    groupRightTail = groupRightHead;
-                    groupLeftTail.next = null;
-                } else {
-                    groupRightHead = groupLeftHead;
-                    groupRightTail = groupRightHead;
-                    groupLeftHead = null;
-                }
-
-                if (groupRightHead == null) {
-                    int lastGroupSize = leftGroupSize;
-                    rightGroupSize = rotationCount % lastGroupSize == 0 ? lastGroupSize : rotationCount % lastGroupSize;
-                    leftGroupSize = lastGroupSize - rightGroupSize;
-                    groupLeftTail = groupLeftHead;
-                    groupRightHead = null;
-                    continue masterLoop;
-                }
-
-                for (int rightGroupIndex = 1; rightGroupIndex < rightGroupSize; rightGroupIndex++) {
-                    groupRightTail = groupRightHead.next;
-
-                    if (groupRightTail == null) {
-                        int lastGroupSize = leftGroupSize + rightGroupIndex;
-                        rightGroupSize = rotationCount % lastGroupSize == 0 ? lastGroupSize : rotationCount % lastGroupSize;
-                        leftGroupSize = lastGroupSize - rightGroupSize;
-                        groupLeftTail = groupLeftHead;
-                        groupRightHead = null;
-                        continue masterLoop;
-                    }
-                }
-
-                nextGroupHead = groupRightTail.next;
-                groupRightTail.next = groupLeftHead;
-                if (lastGroupTail != null ) lastGroupTail.next = groupRightHead;
-                lastGroupTail = groupLeftTail;
-                if (finalHead == null) finalHead = groupRightHead;
-
-                groupLeftHead = nextGroupHead;
-                groupLeftTail = groupLeftHead;
-                groupRightHead = null;
-                groupRightTail = null;
-
-                nextGroupHead = null;
+            while (nextGroupHeadNode != null) {
+                RotatedListGroup rotatedListGroup = rotateGroup(nextGroupHeadNode, rotationCount, groupSize);
+                if (headNode == null) headNode = rotatedListGroup.groupHeadNode;
+                if (lastGroupTailNode != null) lastGroupTailNode.next = rotatedListGroup.groupHeadNode;
+                lastGroupTailNode = rotatedListGroup.groupTailNode;
+                nextGroupHeadNode = rotatedListGroup.nextGroupHeadNode;
             }
 
-            head = finalHead;
+            head = headNode;
         }
 
-        public void batchRotateTwo(int rotationCount, int groupSize) {
-            rotationCount = rotationCount % groupSize;
+        private RotatedListGroup rotateGroup(Node<DataType> groupHeadNode, int rotationCount, int groupSize) {
+            if (rotationCount == 0) {
+                Node<DataType> groupTailNode = groupHeadNode;
+                for (int groupIndex = 2; groupIndex <= groupSize; groupIndex++) {
+                    if (groupTailNode.next == null) return rotateGroup(groupHeadNode, rotationCount % (groupIndex - 1), groupIndex - 1);
+                    groupTailNode = groupTailNode.next;
+                }
+                return new RotatedListGroup (
+                        groupHeadNode,
+                        groupTailNode,
+                        groupTailNode.next
+                );
+            }
 
             int leftGroupSize = groupSize - rotationCount;
             int rightGroupSize = rotationCount;
 
-            Node<DataType> futureHead = null;
+            Node<DataType> leftGroupHeadNode = groupHeadNode;
+            Node<DataType> leftGroupTailNode = groupHeadNode;
 
-            Node<DataType> leftGroupHead = head;
-            Node<DataType> rightGroupHead = null;
-
-            Node<DataType> lastGroupTail = null;
-
-            while (leftGroupHead != null) {
-                Node<DataType> currentNode = leftGroupHead.next;
-                Node<DataType> leftGroupTail = leftGroupHead;
-
-                for (int leftGroupIndex = 1; leftGroupIndex < leftGroupSize; leftGroupIndex++) {
-                    if (currentNode == null) break;
-                    Node<DataType> tempNode = currentNode.next;
-                    currentNode.next = leftGroupHead;
-                    leftGroupHead = currentNode;
-                    currentNode = tempNode;
-                }
-
-                rightGroupHead = currentNode;
-                if (rightGroupHead != null) currentNode = rightGroupHead.next;
-                Node<DataType> rightGroupTail = rightGroupHead;
-
-                for (int rightGroupIndex = 1; rightGroupIndex < rightGroupSize; rightGroupIndex++) {
-                    if (currentNode == null) break;
-                    Node<DataType> tempNode = currentNode.next;
-                    currentNode.next = rightGroupHead;
-                    rightGroupHead = currentNode;
-                    currentNode = tempNode;
-                }
-
-                leftGroupTail.next = rightGroupHead;
-                if (rightGroupTail != null) rightGroupTail.next = null;
-                Node<DataType> nextGroupCurrentNode = currentNode;
-
-                Node<DataType> headNode = leftGroupHead;
-                Node<DataType> tailNode = leftGroupHead;
-                currentNode = headNode.next;
-                headNode.next = null;
-                while (currentNode != null) {
-                    Node<DataType> tempNode = currentNode.next;
-                    currentNode.next = headNode;
-                    headNode = currentNode;
-                    currentNode = tempNode;
-                }
-
-                if (futureHead == null) futureHead = headNode;
-                if (lastGroupTail != null) lastGroupTail.next = headNode;
-                lastGroupTail = tailNode;
-
-                leftGroupHead = nextGroupCurrentNode;
+            for (int leftGroupIndex = 2; leftGroupIndex <= leftGroupSize; leftGroupIndex++) {
+                if (leftGroupTailNode.next == null) return rotateGroup(groupHeadNode, rotationCount % (leftGroupIndex - 1), leftGroupIndex - 1);
+                leftGroupTailNode = leftGroupTailNode.next;
             }
 
-            head = futureHead;
+            if (leftGroupTailNode.next == null) return rotateGroup(groupHeadNode, rotationCount % leftGroupSize, leftGroupSize);
+
+            Node<DataType> rightGroupHeadNode = leftGroupTailNode.next;
+            Node<DataType> rightGroupTailNode = leftGroupTailNode.next;
+
+            for (int rightGroupIndex = 2; rightGroupIndex <= rightGroupSize; rightGroupIndex++) {
+                if (rightGroupTailNode.next == null) return rotateGroup(groupHeadNode, rotationCount % (leftGroupSize + rightGroupIndex - 1), leftGroupSize + rightGroupIndex - 1);
+                rightGroupTailNode = rightGroupTailNode.next;
+            }
+
+            Node<DataType> nextGroupHeadNode = rightGroupTailNode.next;
+
+            rightGroupTailNode.next = leftGroupHeadNode;
+            leftGroupTailNode.next = null;
+
+            return new RotatedListGroup (
+                    rightGroupHeadNode,
+                    leftGroupTailNode,
+                    nextGroupHeadNode
+            );
+
         }
 
+        private class RotatedListGroup {
+            Node<DataType> groupHeadNode;
+            Node<DataType> groupTailNode;
+            Node<DataType> nextGroupHeadNode;
+
+            public RotatedListGroup(Node<DataType> groupHeadNode,
+                                    Node<DataType> groupTailNode,
+                                    Node<DataType> nextGroupHeadNode) {
+                this.groupHeadNode = groupHeadNode;
+                this.groupTailNode = groupTailNode;
+                this.nextGroupHeadNode = nextGroupHeadNode;
+            }
+        }
+    }
+    public static class SinglyLinkedListTwo<DataType> extends SinglyLinkedList<DataType> {
+
+        @Override
+        public void batchRotate(int rotationCount, int groupSize) {
+            rotationCount = rotationCount % groupSize;
+            int leftGroupSize = groupSize - rotationCount;
+            int rightGroupSize = rotationCount;
+            Node<DataType> headNode = null;
+            Node<DataType> lastGroupTail = null;
+            Node<DataType> nextGroupHead = head;
+
+            while (nextGroupHead != null) {
+                ReverseListGroupOP leftReverse = reverse(nextGroupHead, leftGroupSize);
+                if (headNode == null) headNode = leftReverse.headNode;
+                if (lastGroupTail != null) lastGroupTail.next = leftReverse.headNode;
+                lastGroupTail = leftReverse.tailNode;
+                nextGroupHead = leftReverse.nextGroupHeadNode;
+
+                if (nextGroupHead != null) {
+                    ReverseListGroupOP rightReverse = reverse(leftReverse.nextGroupHeadNode, rightGroupSize);
+                    lastGroupTail.next = rightReverse.headNode;
+                    lastGroupTail = rightReverse.tailNode;
+                    nextGroupHead = rightReverse.nextGroupHeadNode;
+                }
+            }
+
+            nextGroupHead = headNode;
+            headNode = null;
+            lastGroupTail = null;
+
+            while (nextGroupHead != null) {
+                ReverseListGroupOP reverse = reverse(nextGroupHead, groupSize);
+                if (headNode == null) headNode = reverse.headNode;
+                if (lastGroupTail != null) lastGroupTail.next = reverse.headNode;
+                lastGroupTail = reverse.tailNode;
+                nextGroupHead = reverse.nextGroupHeadNode;
+            }
+
+            head = headNode;
+        }
+
+        private ReverseListGroupOP reverse(Node<DataType> headNode, int nodeCount) {
+            Node<DataType> tailNode = headNode;
+            Node<DataType> nextGroupHeadNode = headNode.next;
+            for (int nodeIndex = 2; nodeIndex <= nodeCount; nodeIndex++) {
+                if (nextGroupHeadNode == null) break;
+
+                Node<DataType> tempNode = nextGroupHeadNode.next;
+                nextGroupHeadNode.next = headNode;
+                headNode = nextGroupHeadNode;
+                nextGroupHeadNode = tempNode;
+
+            }
+
+            tailNode.next = null;
+
+            return new ReverseListGroupOP(
+                    headNode,
+                    tailNode,
+                    nextGroupHeadNode
+            );
+        }
+
+        private class ReverseListGroupOP {
+            Node<DataType> headNode;
+            Node<DataType> tailNode;
+            Node<DataType> nextGroupHeadNode;
+            private ReverseListGroupOP(Node<DataType> headNode, Node<DataType> tailNode, Node<DataType> nextGroupHeadNode) {
+                this.headNode = headNode;
+                this.tailNode = tailNode;
+                this.nextGroupHeadNode = nextGroupHeadNode;
+            }
+        }
     }
 
     public static void main(String[] args) {
         // First Problem First Approach
         System.out.println(" ========= First Problem First Approach ========= ");
-        SinglyLinkedList<Integer> singlyLinkedListOne = new SinglyLinkedList<>();
+        SinglyLinkedList<Integer> singlyLinkedListOne = new SinglyLinkedListOne<>();
 
         for (int value = 100; value >= 10; value -= 10)
             singlyLinkedListOne.add(value);
 
         singlyLinkedListOne.printList();
-        singlyLinkedListOne.batchRotateOne(2, 4);
+        singlyLinkedListOne.batchRotate(2, 4);
         System.out.println("batch rotate ONE --> ");
         singlyLinkedListOne.printList();
 
         // First Problem Second Approach
         System.out.println(" ========= First Problem Second Approach ========= ");
-        singlyLinkedListOne = new SinglyLinkedList<>();
+        SinglyLinkedList<Integer> singlyLinkedListTwo = new SinglyLinkedListTwo<>();
 
         for (int value = 100; value >= 10; value -= 10)
-            singlyLinkedListOne.add(value);
+            singlyLinkedListTwo.add(value);
 
-        singlyLinkedListOne.printList();
-        singlyLinkedListOne.batchRotateTwo(2, 4);
+        singlyLinkedListTwo.printList();
+        singlyLinkedListTwo.batchRotate(2, 4);
         System.out.println("batch rotate TWO --> ");
-        singlyLinkedListOne.printList();
+        singlyLinkedListTwo.printList();
 
         // Second Problem First Approach
         System.out.println("\n ========= Second Problem First Approach ========= ");
-        singlyLinkedListOne = new SinglyLinkedList<>();
+        singlyLinkedListOne = new SinglyLinkedListOne<>();
 
         for (int value = 100; value >= 40; value -= 10)
             if (value != 50) singlyLinkedListOne.add(value);
 
         singlyLinkedListOne.printList();
-        singlyLinkedListOne.batchRotateOne(1, 3);
+        singlyLinkedListOne.batchRotate(1, 3);
         System.out.println("batch rotate ONE --> ");
         singlyLinkedListOne.printList();
 
         // Second Problem Second Approach
         System.out.println("\n ========= Second Problem Second Approach ========= ");
-        singlyLinkedListOne = new SinglyLinkedList<>();
+        singlyLinkedListTwo = new SinglyLinkedListTwo<>();
 
         for (int value = 100; value >= 40; value -= 10)
-            if (value != 50) singlyLinkedListOne.add(value);
+            if (value != 50) singlyLinkedListTwo.add(value);
 
-        singlyLinkedListOne.printList();
-        singlyLinkedListOne.batchRotateTwo(1, 3);
+        singlyLinkedListTwo.printList();
+        singlyLinkedListTwo.batchRotate(1, 3);
         System.out.println("batch rotate TWO --> ");
-        singlyLinkedListOne.printList();
+        singlyLinkedListTwo.printList();
     }
 }
