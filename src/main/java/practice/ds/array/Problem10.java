@@ -2,6 +2,11 @@ package practice.ds.array;
 
 public class Problem10 {
 
+    /**
+     * Count of possible rotations of given Array to remove largest element from first half
+     * https://www.geeksforgeeks.org/count-of-possible-rotations-of-given-array-to-remove-largest-element-from-first-half/
+     */
+
     public static int findNumberOfCyclicShifts(int[] array) {
         Integer maxValue = null;
         int initialMaxValueIndex = -1;
