@@ -2,6 +2,11 @@ package practice.ds.matrix.easy;
 
 public class Problem2 {
 
+    // Program for scalar multiplication of a matrix
+    // https://www.geeksforgeeks.org/program-for-scalar-multiplication-of-a-matrix/
+
+    // Time-Complexity :: O(n*m)
+    // Space-Complexity :: O(1)
     public static int[][] scalarMultiplication(int[][] matrix, int scalarValue) {
         int rows = matrix.length - 1;
         int cols = matrix[0].length >= 1 ? matrix[0].length - 1 : 0;
