@@ -3,6 +3,8 @@ package practice.ds.matrix.easy;
 import java.util.Arrays;
 import java.util.HashSet;
 
+// Find distinct elements common to all rows of a matrix
+// https://www.geeksforgeeks.org/find-distinct-elements-common-rows-matrix/
 public class Problem4 {
 
     public static class StrategyOne {
