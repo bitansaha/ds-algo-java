@@ -2,6 +2,8 @@ package practice.ds.matrix.medium;
 
 import java.util.Optional;
 
+// Maximum size square sub-matrix with all 1s
+// https://www.geeksforgeeks.org/maximum-size-sub-matrix-with-all-1s-in-a-binary-matrix/
 public class Problem6 {
 
     // Time-Complexity :: O(n^4)
